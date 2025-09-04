@@ -1,57 +1,633 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Bakımdayız! Daha sonra tekrar gel.</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Discord Profilim</title>
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
+
+    :root {
+      --bg-primary: rgba(44, 47, 51, 0.85);
+      --bg-secondary: rgba(35, 39, 42, 0.88);
+      --bg-tertiary: rgba(30, 33, 36, 0.85);
+      --text-primary: #ffffff;
+      --text-secondary: #b9bbbe;
+      --text-muted: #dcddde;
+      --accent-color: #7289da;
+      --accent-secondary: #5865f2;
+      --card-bg: rgba(35, 39, 42, 0.95);
+      --border-color: rgba(255,255,255,0.1);
+    }
+
+    [data-theme="light"] {
+      --bg-primary: rgba(248, 249, 250, 0.95);
+      --bg-secondary: rgba(255, 255, 255, 0.98);
+      --bg-tertiary: rgba(240, 242, 245, 0.95);
+      --text-primary: #2c2f33;
+      --text-secondary: #747f8d;
+      --text-muted: #4f545c;
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --border-color: rgba(0,0,0,0.1);
+    }
+
     body {
-      background: linear-gradient(135deg, #2c3e50, #3498db);
-      color: #fff;
-      font-family: 'Segoe UI', sans-serif;
-      height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
+      background: #2c2f33;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, 
+        #1e2124 0%, 
+        #2c2f33 25%,
+        #23272a 50%,
+        #2c2f33 75%,
+        #1e2124 100%);
+      background-image: radial-gradient(circle at 25% 25%, rgba(114, 137, 218, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 75% 75%, rgba(88, 101, 242, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 50% 50%, rgba(114, 137, 218, 0.04) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: -1;
+      transition: all 0.3s ease;
+    }
+
+    [data-theme="light"] body::before {
+      background: linear-gradient(135deg, 
+        rgba(248, 249, 250, 0.95) 0%, 
+        rgba(255, 255, 255, 0.98) 25%,
+        rgba(240, 242, 245, 0.95) 50%,
+        rgba(255, 255, 255, 0.98) 75%,
+        rgba(248, 249, 250, 0.95) 100%);
+      background-image: radial-gradient(circle at 25% 25%, rgba(114, 137, 218, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 75% 75%, rgba(88, 101, 242, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 50% 50%, rgba(114, 137, 218, 0.04) 0%, transparent 70%);
+    }
+
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: rgba(114, 137, 218, 0.6);
+      border-radius: 50%;
+      animation: float 6s infinite linear;
+    }
+
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100px) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--card-bg);
+      border: 2px solid var(--border-color);
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
       display: flex;
       align-items: center;
       justify-content: center;
-      text-align: center;
-      padding: 20px;
-    }
-    .container {
-      background: rgba(255, 255, 255, 0.05);
-      padding: 40px;
-      border-radius: 20px;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-    }
-    h1 {
-      font-size: 2.5em;
-      margin-bottom: 20px;
-    }
-    p {
+      cursor: pointer;
       font-size: 1.2em;
-      opacity: 0.9;
+      transition: all 0.3s ease;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
     }
-    @media (max-width: 600px) {
-      h1 {
-        font-size: 2em;
+
+    .theme-toggle:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 20px rgba(114, 137, 218, 0.5);
+    }
+
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      border-radius: 24px;
+      padding: 0;
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3), 
+                  0 0 0 1px var(--border-color),
+                  0 0 60px rgba(114, 137, 218, 0.1);
+      overflow: hidden;
+      position: relative;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      z-index: 10;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.4), 
+                  0 0 0 1px rgba(255,255,255,0.15),
+                  0 0 80px rgba(114, 137, 218, 0.3);
+    }
+
+    .banner {
+      width: 100%;
+      height: 140px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      margin-bottom: -60px;
+    }
+
+    .banner::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: linear-gradient(transparent, var(--card-bg));
+    }
+
+    .profile-section {
+      padding: 60px 30px 30px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 6px solid #23272a;
+      object-fit: cover;
+      position: relative;
+      z-index: 3;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3),
+                  0 0 0 2px rgba(114, 137, 218, 0.3),
+                  0 0 30px rgba(114, 137, 218, 0.2);
+    }
+
+    .avatar:hover {
+      transform: scale(1.05);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4),
+                  0 0 0 3px rgba(114, 137, 218, 0.5),
+                  0 0 50px rgba(114, 137, 218, 0.4);
+    }
+
+    .status-indicator {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      width: 24px;
+      height: 24px;
+      background: #43b581;
+      border: 4px solid #23272a;
+      border-radius: 50%;
+      z-index: 4;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(67, 181, 129, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(67, 181, 129, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(67, 181, 129, 0); }
+    }
+
+    .username {
+      font-size: 1.8em;
+      font-weight: 700;
+      margin: 20px 0 8px;
+      color: var(--text-primary);
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      filter: drop-shadow(0 0 10px rgba(114, 137, 218, 0.3));
+    }
+
+    .tag {
+      color: var(--text-secondary);
+      font-size: 1em;
+      font-weight: 500;
+      margin-bottom: 20px;
+      opacity: 0.8;
+    }
+
+    .about {
+      margin: 20px 0;
+      font-size: 1em;
+      line-height: 1.5;
+      color: var(--text-muted);
+      background: rgba(44, 47, 51, 0.6);
+      padding: 16px;
+      border-radius: 12px;
+      border-left: 4px solid var(--accent-color);
+      box-shadow: 0 4px 20px rgba(114, 137, 218, 0.1);
+    }
+
+    .badges {
+      margin: 20px 0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2em;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .badge:hover {
+      transform: translateY(-3px) scale(1.1);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    }
+
+    .badge.nitro { background: linear-gradient(135deg, #ff73fa, #7c3aed); }
+    .badge.boost { background: linear-gradient(135deg, #f093fb, #f5576c); }
+    .badge.partner { background: linear-gradient(135deg, #5865f2, #7289da); }
+    .badge.developer { background: linear-gradient(135deg, #00d4aa, #01b574); }
+    .badge.early { background: linear-gradient(135deg, #7289da, #99aab5); }
+
+    .badge-tooltip {
+      position: absolute;
+      bottom: 120%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.9);
+      color: white;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 0.8em;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      z-index: 1000;
+    }
+
+    .badge:hover .badge-tooltip {
+      opacity: 1;
+    }
+
+    .labels {
+      margin: 20px 0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .labels span {
+      background: linear-gradient(135deg, var(--accent-color), var(--accent-secondary));
+      color: white;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 0.85em;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      cursor: default;
+      box-shadow: 0 4px 12px rgba(114, 137, 218, 0.3),
+                  0 0 20px rgba(114, 137, 218, 0.1);
+    }
+
+    .labels span:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(114, 137, 218, 0.4),
+                  0 0 30px rgba(114, 137, 218, 0.2);
+    }
+
+    .socials {
+      margin-top: 25px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .socials a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 1.1em;
+      font-weight: 600;
+      padding: 12px 20px;
+      border-radius: 12px;
+      background: rgba(44, 47, 51, 0.6);
+      transition: all 0.3s ease;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .socials a:hover {
+      color: var(--accent-color);
+      background: rgba(114, 137, 218, 0.1);
+      border-color: var(--accent-color);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(114, 137, 218, 0.2);
+    }
+
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: var(--accent-color);
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card.loaded {
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    @media (max-width: 480px) {
+      .card {
+        margin: 10px;
+        border-radius: 20px;
       }
-      p {
-        font-size: 1em;
+      
+      .profile-section {
+        padding: 50px 20px 20px;
+      }
+      
+      .avatar {
+        width: 100px;
+        height: 100px;
+      }
+      
+      .username {
+        font-size: 1.5em;
+      }
+      
+      .socials {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .theme-toggle {
+        top: 10px;
+        right: 10px;
+        width: 40px;
+        height: 40px;
       }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Bakımdayız 🚧</h1>
-    <p>Web sitemiz şu anda planlı bakım nedeniyle geçici olarak kapalıdır.<br>
-    En kısa sürede geri döneceğiz. Anlayışınız için teşekkür ederiz.</p>
+  <div class="particles" id="particles"></div>
+  
+  <div class="theme-toggle" id="themeToggle" title="Tema Değiştir">
+    🌙
   </div>
+
+  <div class="card" id="profileCard">
+    <div style="position: absolute; top: 10px; right: 10px; background: rgba(255, 193, 7, 0.9); color: #000; padding: 4px 8px; border-radius: 12px; font-size: 0.7em; font-weight: 600; z-index: 10;">
+      🚧 Geliştiriliyor
+    </div>
+    <div class="banner" id="banner"></div>
+    <div class="profile-section">
+      <div style="position: relative; display: inline-block;">
+        <img id="avatar" class="avatar" src="/placeholder.svg" alt="Avatar" style="display: none;">
+        <div class="loading" id="avatarLoader"></div>
+        <div class="status-indicator"></div>
+      </div>
+      <div class="username" id="username">Yükleniyor...</div>
+      <div class="tag" id="tag"></div>
+      <div class="about" id="about"></div>
+      
+      <div class="badges" id="badges">
+        <div class="badge nitro" title="Discord Nitro">
+          💎
+          <div class="badge-tooltip">Discord Nitro</div>
+        </div>
+        <div class="badge boost" title="Server Booster">
+          🚀
+          <div class="badge-tooltip">Server Booster</div>
+        </div>
+        <div class="badge partner" title="Discord Partner">
+          💪
+          <div class="badge-tooltip">HypeSquad Bravery</div>
+        </div>
+        <div class="badge developer" title="Active Developer">
+          🔧
+          <div class="badge-tooltip">Active Developer</div>
+        </div>
+        <div class="badge early" title="Early Supporter">
+          ⭐
+          <div class="badge-tooltip">Completed A Question</div>
+        </div>
+      </div>
+      
+      <div class="labels" id="labels"></div>
+      <div class="socials" id="socials"></div>
+    </div>
+  </div>
+
+  <script>
+    const config = {
+      "user_id": "366544362676420620",
+      "username": "alphams",
+      "tag": "",
+      "display_name": "! Alphams ᶻz𐰁",
+      "avatar_url": "https://cdn.discordapp.com/avatars/366544362676420620/6399c437c9452dad19eea6ede4c812ce.webp?size=1024",
+      "banner_url": "https://cdn.discordapp.com/banners/366544362676420620/adc34e1a16e10063852a6b2576d368cf.webp?size=1024",
+      "about": "I KNEEL ONLY TO ALLAH\n- İnnâ lillâhi ve innâ ileyhi râciûn.\n- ( Biz Allah'a aidiz ve kuşkusuz O'na döneceğiz. )\n\nmadarams.com\nhttps://guns.lol/alphams",
+      "labels": ["FreePalestine", "FreeEastTurkestan", "Builder"],
+      "accent_color": "#7289da",
+      "socials": {
+        "website": "https://madarams.com",
+		"discord": "https://discord.com/users/366544362676420620",
+		"STW": "https://fortnitedb.com/profile/Furkanᶫᵒᵛᵉᵧₒᵤツ",
+      }
+    };
+
+    function createParticles() {
+      const particlesContainer = document.getElementById('particles');
+      
+      function createParticle() {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.animationDuration = (Math.random() * 3 + 4) + 's';
+        particle.style.animationDelay = Math.random() * 2 + 's';
+        
+        const colors = ['rgba(114, 137, 218, 0.6)', 'rgba(88, 101, 242, 0.4)', 'rgba(255, 255, 255, 0.3)'];
+        particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+        
+        particlesContainer.appendChild(particle);
+        
+        setTimeout(() => {
+          particle.remove();
+        }, 8000);
+      }
+      
+      for (let i = 0; i < 15; i++) {
+        setTimeout(createParticle, i * 200);
+      }
+      
+      setInterval(createParticle, 800);
+    }
+
+    function initThemeToggle() {
+      const themeToggle = document.getElementById('themeToggle');
+      const body = document.body;
+      
+      let isDark = true;
+      
+      themeToggle.addEventListener('click', () => {
+        isDark = !isDark;
+        
+        if (isDark) {
+          body.removeAttribute('data-theme');
+          themeToggle.textContent = '🌙';
+          themeToggle.title = 'Açık Tema';
+        } else {
+          body.setAttribute('data-theme', 'light');
+          themeToggle.textContent = '☀️';
+          themeToggle.title = 'Koyu Tema';
+        }
+        
+        themeToggle.style.transform = 'scale(0.8)';
+        setTimeout(() => {
+          themeToggle.style.transform = 'scale(1)';
+        }, 150);
+      });
+    }
+
+    function loadProfile() {
+      const card = document.getElementById("profileCard");
+      const avatar = document.getElementById("avatar");
+      const avatarLoader = document.getElementById("avatarLoader");
+      
+      avatar.onload = function() {
+        avatarLoader.style.display = 'none';
+        avatar.style.display = 'block';
+        avatar.style.animation = 'fadeIn 0.5s ease-out';
+      };
+      
+      avatar.onerror = function() {
+        avatarLoader.style.display = 'none';
+        avatar.style.display = 'block';
+        avatar.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSIjNzI4OWRhIi8+Cjx0ZXh0IHg9IjUwIiB5PSI1NSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+QXZhdGFyPC90ZXh0Pgo8L3N2Zz4K';
+      };
+      
+      avatar.src = config.avatar_url;
+      
+      document.getElementById("username").innerText = config.display_name || config.username;
+      const tagElement = document.getElementById("tag");
+      if (config.tag && config.tag.trim() !== "") {
+        tagElement.innerText = `#${config.tag}`;
+        tagElement.style.display = 'block';
+      } else {
+        tagElement.style.display = 'none';
+      }
+      const aboutElement = document.getElementById("about");
+      aboutElement.innerHTML = config.about.replace(/\n/g, '<br>');
+      
+      const banner = document.getElementById("banner");
+      if (config.banner_url) {
+        banner.style.backgroundImage = `url('${config.banner_url}')`;
+      } else {
+        banner.style.background = 'linear-gradient(135deg, #7289da, #5865f2)';
+      }
+
+      const labelsContainer = document.getElementById("labels");
+      labelsContainer.innerHTML = '';
+      config.labels.forEach((label, index) => {
+        setTimeout(() => {
+          const span = document.createElement("span");
+          span.innerText = label;
+          span.style.animation = `fadeIn 0.5s ease-out ${index * 0.1}s both`;
+          labelsContainer.appendChild(span);
+        }, index * 100);
+      });
+
+      const socialsContainer = document.getElementById("socials");
+      socialsContainer.innerHTML = '';
+      
+      const socialIcons = {
+        website: '🌐',
+        github: '📱',
+        twitter: '🐦',
+        instagram: '📷',
+        "STW": '🎮',
+        discord: '💬'
+      };
+      
+      for (let [key, url] of Object.entries(config.socials)) {
+        if (url) {
+          const a = document.createElement("a");
+          a.href = url;
+          a.target = "_blank";
+          a.rel = "noopener noreferrer";
+          a.innerHTML = `${socialIcons[key] || '🔗'} ${key.charAt(0).toUpperCase() + key.slice(1)}`;
+          a.style.animation = 'fadeIn 0.5s ease-out 0.8s both';
+          socialsContainer.appendChild(a);
+        }
+      }
+      
+      setTimeout(() => {
+        card.classList.add('loaded');
+      }, 100);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadProfile();
+      createParticles();
+      initThemeToggle();
+    });
+  </script>
 </body>
 </html>
-
